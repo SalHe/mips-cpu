@@ -70,6 +70,7 @@ module CPU #(
     wire ctrlImmExtendMode;
     Ctrl ctrl(
            opcode,
+           func,
            ctrlRegDst,
            ctrlBranch,
            ctrlMemRead,

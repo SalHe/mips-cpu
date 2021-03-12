@@ -21,6 +21,7 @@
 
 module Ctrl (
     input wire [5: 0] opcode,
+    input wire [5: 0] funct,
 
     output reg [1:0] ctrlRegDst,
     output reg ctrlBranch,
@@ -50,7 +51,26 @@ module Ctrl (
 
         case (opcode)
             `INSTR_OP_RTYPE: begin
-
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlRegDst      <= `SEL_REGDST_RD;
+                ctrlALUOp       <= `CtrlALUOp_FUNCT;
+                ctrlALUSrc      <= `SEL_ALUSRC_REG;
+                ctrlRegWrite    <= 1;
+                /*
+                    啥也不用动
+                    case (funct)
+                        `INSTR_FUNCT_ADD:
+                        `INSTR_FUNCT_ADDU:
+                        `INSTR_FUNCT_SUB:
+                        `INSTR_FUNCT_SUBU:
+                        `INSTR_FUNCT_AND:
+                        `INSTR_FUNCT_OR:
+                        `INSTR_FUNCT_XOR:
+                        `INSTR_FUNCT_NOR:
+                        `INSTR_FUNCT_SLT:
+                        `INSTR_FUNCT_SLTU:
+                    endcase
+                */
             end
 
             `INSTR_OP_ADDI: begin
@@ -174,7 +194,16 @@ module ALUCtrl (
        case (ctrlALUOp)
            `CtrlALUOp_FUNCT: begin
                case (funct)
-                   `INSTR_FUNCT_ADD: tempFunct <= `ALUOp_ADD;
+                   `INSTR_FUNCT_ADD:    tempFunct <= `ALUOp_ADD;
+                   `INSTR_FUNCT_ADDU:   tempFunct <= `ALUOp_ADDU;
+                   `INSTR_FUNCT_SUB:    tempFunct <= `ALUOp_SUB;
+                   `INSTR_FUNCT_SUBU:   tempFunct <= `ALUOp_SUBU;
+                   `INSTR_FUNCT_AND:    tempFunct <= `ALUOp_AND;
+                   `INSTR_FUNCT_OR:     tempFunct <= `ALUOp_OR;
+                   `INSTR_FUNCT_XOR:    tempFunct <= `ALUOp_XOR;
+                   `INSTR_FUNCT_NOR:    tempFunct <= `ALUOp_NOR;
+                   `INSTR_FUNCT_SLT:    tempFunct <= `ALUOp_SLT;
+                   `INSTR_FUNCT_SLTU:   tempFunct <= `ALUOp_SLTU;
                endcase
            end
            `CtrlALUOp_EXTOP: tempFunct <= aluExtOp;

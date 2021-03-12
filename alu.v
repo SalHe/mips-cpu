@@ -48,6 +48,7 @@ module ALU
             `ALUOp_LUI:     out <= {inB[15:0], {16{1'b0}}};
             `ALUOp_AND:     out <= inA & inB ;
             `ALUOp_XOR:     out <= inA ^ inB ;
+            `ALUOp_NOR:     out <= ~(inA | inB) ;
             `ALUOp_SLT:     out <= ($signed(inA) < $signed(inB)) ? 1 : 0;
             `ALUOp_SLTU:    out <= ($unsigned(inA) < $unsigned(inB)) ? 1 : 0;
             default: out <= 0;
