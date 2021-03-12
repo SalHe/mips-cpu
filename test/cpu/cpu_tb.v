@@ -10,7 +10,8 @@ module cpu_tb ();
     integer i = 0;
     reg clk;
 
-    CPU mipsCpu(clk);
+    CPU #(`IM_DATA_FILE)
+        mipsCpu(clk);
     
     initial begin
 

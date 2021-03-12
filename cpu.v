@@ -10,7 +10,9 @@
 `include "alu.v"
 `include "dm.v"
 
-module CPU (
+module CPU #(
+    parameter IM_DATA_FILE = "im_data.txt"
+)(
     input wire clk
 );
 
@@ -30,7 +32,7 @@ module CPU (
     end
 
     // 取指令
-    IM #(128, "im_data.txt") 
+    IM #(.IM_DATA_FILE(IM_DATA_FILE)) 
         im(clk, PC, code);
 
     // 分析指令

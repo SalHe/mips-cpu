@@ -1,0 +1,6 @@
+bin2hex
+
+*.elf
+*.hex
+*.text
+*.out
