@@ -22,7 +22,7 @@ bin2hex: bin2hex.c
 	$(AS) -O0 -mips32 -o $@ $<
 
 %.text: %.elf
-	$(OBJCOPY) -O binary -j=.text $< $@
+	$(OBJCOPY) -O binary --only-section=.text $< $@
 
 %.hex: %.text bin2hex
 	./bin2hex $< $@
