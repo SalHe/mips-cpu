@@ -3,6 +3,17 @@
 
 `include "constants.v"
 
+`define SEL_REGDST_RT   2'b00   // 写回到指令中指定的rt号寄存器
+`define SEL_REGDST_RD   2'b01   // 写回到指令中指定的rd号寄存器
+`define SEL_REGDST_RA   2'b10   // 写回到$ra（31号寄存器）
+
+`define SEL_ALUSRC_REG  1'b0    // 以指令中给定的源寄存器号中的内容作为操作数2
+`define SEL_ALUSRC_IMM  1'b1    // 以指令中给定的立即数作为操作数2
+
+`define SEL_WB_ALUOUT   2'b00   // 将ALU运算结果写回
+`define SEL_WB_DM       2'b01   // 将DM读出的结果写回
+`define SEL_WB_PC4      2'b10   // 将PC4写回
+
 module MUX2 #(
     parameter WORD_WIDTH = `WORD_WIDTH,
     parameter SEL_WIDTH = 1
