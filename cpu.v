@@ -62,7 +62,7 @@ module CPU #(
     wire ctrlBranch;
     wire ctrlMemRead;
     wire [1:0] ctrlMemToReg;
-    wire [1:0] ctrlALUOp;
+    wire [2:0] ctrlALUOp;
     wire ctrlMemWrite;
     wire ctrlALUSrc;
     wire ctrlRegWrite;
@@ -90,7 +90,7 @@ module CPU #(
         );
 
     // 与寄存器相连
-    wire [`WORD_WIDTH-1: 0] dataToWriteReg;
+    wire [`WORD_WIDTH-1: 0] dataWriteToReg;
     wire [`WORD_WIDTH-1: 0] regOutData1;
     wire [`WORD_WIDTH-1: 0] regOutData2;
     RegFile regFile(
@@ -99,7 +99,7 @@ module CPU #(
         rs, rt,          // Read Addr
 
         regWriteAddr,    // Write Addr
-        dataToWriteReg,  // Data to write
+        dataWriteToReg,  // Data to write
         ctrlRegWrite,     // Whether to write
 
         regOutData1,     // Out data
@@ -150,7 +150,7 @@ module CPU #(
             memOutData,
             PC4,
             ctrlMemToReg,
-            dataToWriteReg
+            dataWriteToReg
         );
 
 endmodule
