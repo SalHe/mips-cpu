@@ -29,7 +29,7 @@ module cpu_tb ();
         // );
 
         // 让其执行指定周期数（用做测试）
-        for (i = 0; i < `INS_NUMS; i++) begin
+        for (i = 0; i <= `INS_NUMS; i++) begin
             @(posedge clk);
         end
 

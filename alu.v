@@ -40,10 +40,14 @@ module ALU
 
     always @(*) begin
         case (ALUOp)
-            `ALUOp_ADD:   out <= $signed(inA) & $signed(inB); 
-            `ALUOp_ADDU:  out <= $unsigned(inA) + $unsigned(inB); 
-            `ALUOp_SUB:   out <= $signed(inA) - $signed(inB); 
-            `ALUOp_SUBU:  out <= $unsigned(inA) - $unsigned(inB); 
+            `ALUOp_ADD:     out <= $signed(inA) + $signed(inB); 
+            `ALUOp_ADDU:    out <= $unsigned(inA) + $unsigned(inB); 
+            `ALUOp_SUB:     out <= $signed(inA) - $signed(inB); 
+            `ALUOp_SUBU:    out <= $unsigned(inA) - $unsigned(inB); 
+            `ALUOp_OR:      out <= inA | inB ;
+            `ALUOp_LUI:     out <= {inB[15:0], {16{1'b0}}};
+            `ALUOp_AND:     out <= inA & inB ;
+            `ALUOp_XOR:     out <= inA ^ inB ;
             default: out <= 0;
         endcase
     end

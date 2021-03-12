@@ -6,6 +6,18 @@
 `include "mux.v"
 `include "extend.v"
 
+
+// `define ALUOp_CALC_MEM_ADDRESS       2'b00
+// `define ALUOp_FUNCT_FROM_INSTRUCTION 2'b10
+// `define ALUOp_CALC_BRANCH_ADDRESS    2'b11
+`define CtrlALUOp_FUNCT                 3'b000
+`define CtrlALUOp_ADD                   3'b001
+`define CtrlALUOp_ADDU                  3'b010
+`define CtrlALUOp_AND                   3'b011
+`define CtrlALUOp_OR                    3'b100
+`define CtrlALUOp_XOR                   3'b101
+`define CtrlALUOp_LU                   3'b110
+
 module Ctrl (
     input wire [5: 0] opcode,
 
@@ -41,7 +53,70 @@ module Ctrl (
             `INSTR_OP_ADDI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `ALUOp_ADD;
+                ctrlALUOp       <= `CtrlALUOp_ADD;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_SIGNED;
+            end
+
+            `INSTR_OP_ADDIU: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_ADDU;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_UNSIGNED;
+            end
+
+            `INSTR_OP_ANDI: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_AND;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_UNSIGNED;
+            end
+
+            `INSTR_OP_ORI: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_OR;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_UNSIGNED;
+            end
+
+            `INSTR_OP_LUI: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_LU;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_UNSIGNED;
+            end
+
+            `INSTR_OP_XORI: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_XOR;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_UNSIGNED;
+            end
+
+            `INSTR_OP_SW: begin
+                ctrlALUOp       <= `CtrlALUOp_ADD;
+                ctrlMemWrite    <= 1;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlImmExtend   <= `EXT_MODE_SIGNED;
+            end
+
+            `INSTR_OP_LW: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemRead     <= 1'b0;
+                ctrlMemToReg    <= `SEL_WB_DM;
+                ctrlALUOp       <= `CtrlALUOp_ADD;
+                ctrlMemRead     <= 1;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
                 ctrlImmExtend   <= `EXT_MODE_SIGNED;
@@ -49,21 +124,11 @@ module Ctrl (
 
             // Unkown OpCode
             default: begin
-                $display("Got an unknown opcode: %x", opcode);
+                // $display("Got an unknown opcode: %x", opcode);
             end
         endcase
     end
 endmodule
-
-// `define ALUOp_CALC_MEM_ADDRESS       2'b00
-// `define ALUOp_FUNCT_FROM_INSTRUCTION 2'b10
-// `define ALUOp_CALC_BRANCH_ADDRESS    2'b11
-`define CtrlALUOp_FUNCT                 3'b000
-`define CtrlALUOp_ADD                   3'b001
-`define CtrlALUOp_ADDU                  3'b010
-`define CtrlALUOp_AND                   3'b011
-`define CtrlALUOp_OR                    3'b100
-`define CtrlALUOp_XOR                   3'b101
 
 module ALUCtrl (
     input wire [2:0] ctrlALUOp,
@@ -80,6 +145,7 @@ module ALUCtrl (
            `CtrlALUOp_AND:   tempFunct <= `ALUOp_AND;
            `CtrlALUOp_OR:    tempFunct <= `ALUOp_OR;
            `CtrlALUOp_XOR:   tempFunct <= `ALUOp_XOR;
+           `CtrlALUOp_LU:    tempFunct <= `ALUOp_LUI;
 
            `CtrlALUOp_FUNCT: begin
                case (funct)
