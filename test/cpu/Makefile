@@ -5,6 +5,7 @@ OBJCOPY = mips-linux-gnu-objcopy
 OBJS = $(shell ls tb*.asm | sed -e 's/.asm/.elf/')
 HEXS = $(shell ls tb*.asm | sed -e 's/.asm/.hex/')
 OUTS = $(shell ls tb*.asm | sed -e 's/.asm/.out/')
+VSRC = $(shell ls ../../*.v)
 
 all: $(OBJS) $(HEXS) $(OUTS)
 
@@ -13,7 +14,7 @@ all: $(OBJS) $(HEXS) $(OUTS)
 
 # %.fv: cpu_tb.v
 # 	iverilog -o $@ $< -I../../
-.PRECIOUS: %.elf %.text
+.PRECIOUS: %.elf %.text %.fv
 
 bin2hex: bin2hex.c
 	gcc -o $@ $<
@@ -28,12 +29,16 @@ bin2hex: bin2hex.c
 	./bin2hex $< $@
 
 %.out: %.fv
-	./$< > $@
+	# ./$< > $@
+	./$<
 
-%.fv: %.hex cpu_tb.v
-	iverilog -I../../			\
-		-DIM_DATA_FILE=\"$<\"	\
-		-o $@ 					\
+%.fv: %.hex cpu_tb.v $(VSRC)
+	iverilog -I../../				\
+		-DIM_DATA_FILE=\"$<\"		\
+		-DDEBUG_CPU					\
+		-DDUMP_FILE="\"$@.vcd\""	\
+		-g2005						\
+		-o $@ 						\
 		cpu_tb.v
 
 clean:
