@@ -59,7 +59,8 @@ module CPU #(
     // always @(posedge clk) begin
     //     PC <= PC4;
     // end
-    NPC npc(clk, ctrlNPCFrom, branchTestResult, PC, imm, jaddrOri, PC4, PC);
+    wire [`WORD_WIDTH-1: 0] regOutData1;
+    NPC npc(clk, ctrlNPCFrom, branchTestResult, PC, regOutData1, imm, jaddrOri, PC4, PC);
 
     // 取指令
     IM #(.IM_DATA_FILE(IM_DATA_FILE)) 
@@ -102,7 +103,7 @@ module CPU #(
 
     // 与寄存器相连
     wire [`WORD_WIDTH-1: 0] dataWriteToReg;
-    wire [`WORD_WIDTH-1: 0] regOutData1;
+    // wire [`WORD_WIDTH-1: 0] regOutData1; //向前定义了
     wire [`WORD_WIDTH-1: 0] regOutData2;
     RegFile regFile(
         clk,             // Clock

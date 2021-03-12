@@ -100,6 +100,19 @@ module Ctrl (
                     `INSTR_FUNCT_SRAV: begin
                         ctrlALUOp       <= `CtrlALUOp_FUNCT;
                     end
+
+                    `INSTR_FUNCT_JR: begin
+                        ctrlRegDst      <= 2'b00;
+                        ctrlNPCFrom     <= `NPC_REG;
+                        ctrlMemRead     <= 1'b0;
+                        ctrlMemToReg    <= 2'b00;
+                        ctrlMemWrite    <= 1'b0;
+                        ctrlMemRead     <= 1'b0;
+                        ctrlALUSrc1     <= 1'b0;
+                        ctrlALUSrc2     <= 1'b0;
+                        ctrlRegWrite    <= 1'b0;
+                        ctrlImmExtend   <= 1'b0;
+                    end
                 endcase
             end
 
