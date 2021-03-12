@@ -4,3 +4,5 @@ bin2hex
 *.hex
 *.text
 *.out
+*.fv
+*.vcd
