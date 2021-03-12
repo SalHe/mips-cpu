@@ -20,7 +20,7 @@ module RegFile #(
     output [`WORD_WIDTH-1:0] outB
 );
 
-    reg [`WORD_WIDTH-1:0] registers[5: 0];
+    reg [`WORD_WIDTH-1:0] registers[31: 0];
     reg [`WORD_WIDTH-1:0] data1, data2;
 
     initial begin
