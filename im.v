@@ -13,7 +13,7 @@ module IM #(
     reg [31: 0] imMem[MEM_SIZE-1: 0];
 
     initial begin
-        $readmemh(IM_DATA_FILE, imMem, 0, MEM_SIZE);
+        $readmemh(IM_DATA_FILE, imMem, 0, MEM_SIZE-1);
     end
 
     assign code = imMem[PC[31:2]];
