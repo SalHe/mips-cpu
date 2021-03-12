@@ -57,10 +57,10 @@ module CPU #(
     assign jaddrOri = code[25:0];
 
     // 控制信号
-    wire ctrlRegDst;
+    wire [1:0] ctrlRegDst;
     wire ctrlBranch;
     wire ctrlMemRead;
-    wire ctrlMemToReg;
+    wire [1:0] ctrlMemToReg;
     wire [1:0] ctrlALUOp;
     wire ctrlMemWrite;
     wire ctrlALUSrc;
@@ -79,10 +79,10 @@ module CPU #(
 
     // 选择写寄存器
     wire [4: 0] regWriteAddr;
-    MUX2 #(.WORD_WIDTH(5), .SEL_WIDTH(1)) 
+    MUX2C #(.WORD_WIDTH(5), .CONSTANT(31)) 
         muxRegDst(
             rt, rd,         // in
-            RegDst,         // sel
+            ctrlRegDst,     // sel
             regWriteAddr    // out
         );
 
@@ -141,10 +141,10 @@ module CPU #(
     );
 
     // 需要回写的数据
-    MUX2 #(.WORD_WIDTH(`WORD_WIDTH), .SEL_WIDTH(1))
-        muxDataToReg(
+    MUX3 muxDataToReg(
             aluOut,
             memOutData,
+            PC4,
             ctrlMemToReg,
             dataToWriteReg
         );

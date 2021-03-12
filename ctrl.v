@@ -1,21 +1,43 @@
 `ifndef _CTRL_V_
 `define _CTRL_V_
 
+`include "risc.v"
+`include "alu.v"
+
 module Ctrl (
     input wire [5: 0] opcode,
 
-    output wire ctrlRegDst,
-    output wire ctrlBranch,
-    output wire ctrlMemRead,
-    output wire ctrlMemToReg,
-    output wire [1:0] ctrlALUOp,
-    output wire ctrlMemWrite,
-    output wire ctrlALUSrc,
-    output wire ctrlRegWrite
+    output reg [1:0] ctrlRegDst,
+    output reg ctrlBranch,
+    output reg ctrlMemRead,
+    output reg [1:0] ctrlMemToReg,
+    output reg [1:0] ctrlALUOp,
+    output reg ctrlMemWrite,
+    output reg ctrlALUSrc,
+    output reg ctrlRegWrite
 );
-    // always @(*) begin
+    always @(*) begin
         
-    // end
+        ctrlRegDst      <= 2'b00;
+        ctrlBranch      <= 1'b0;
+        ctrlMemRead     <= 1'b0;
+
+        case (opcode)
+            `INSTR_OP_RTYPE: begin
+
+            end
+
+            `INSTR_OP_ADDI: begin
+                
+                
+            end
+
+            // Unkown OpCode
+            default: begin
+                $display("Got an unknown opcode: %x", opcode);
+            end
+        endcase
+    end
 endmodule
 
 `define ALUOp_CALC_MEM_ADDRESS       2'b00
