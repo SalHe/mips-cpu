@@ -111,9 +111,9 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] aluSrc2;
     wire [`WORD_WIDTH-1: 0] immSignedExtended;
     // assign immSignedExtended = {{16{imm[15]}}, imm};
+    assign aluSrc1 = regOutData1;
     Extend immExter(imm, ctrlImmExtendMode, immSignedExtended);
     
-    assign aluSrc2 = regOutData1;
     MUX2 #(.SEL_WIDTH(1)) 
         muxALUSrc(
             regOutData2, 
