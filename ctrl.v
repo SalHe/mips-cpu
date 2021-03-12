@@ -11,7 +11,7 @@
 // `define ALUOp_FUNCT_FROM_INSTRUCTION 2'b10
 // `define ALUOp_CALC_BRANCH_ADDRESS    2'b11
 `define CtrlALUOp_FUNCT                 3'b000
-`define CtrlALUOp_EXFUNCT               3'b001
+`define CtrlALUOp_EXTOP                 3'b001
 // `define CtrlALUOp_ADD                   3'b001
 // `define CtrlALUOp_ADDU                  3'b010
 // `define CtrlALUOp_AND                   3'b011
@@ -56,7 +56,7 @@ module Ctrl (
             `INSTR_OP_ADDI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_ADD;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
@@ -66,7 +66,7 @@ module Ctrl (
             `INSTR_OP_ADDIU: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_ADDU;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
@@ -76,7 +76,7 @@ module Ctrl (
             `INSTR_OP_ANDI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_AND;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
@@ -86,7 +86,7 @@ module Ctrl (
             `INSTR_OP_ORI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_OR;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
@@ -96,7 +96,7 @@ module Ctrl (
             `INSTR_OP_LUI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_LUI;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
@@ -106,7 +106,7 @@ module Ctrl (
             `INSTR_OP_XORI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_XOR;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
@@ -114,7 +114,7 @@ module Ctrl (
             end
 
             `INSTR_OP_SW: begin
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_ADD;
                 ctrlMemWrite    <= 1;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
@@ -125,9 +125,29 @@ module Ctrl (
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemRead     <= 1'b0;
                 ctrlMemToReg    <= `SEL_WB_DM;
-                ctrlALUOp       <= `CtrlALUOp_EXFUNCT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_ADD;
                 ctrlMemRead     <= 1;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_SIGNED;
+            end
+
+            `INSTR_OP_SLTI: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
+                ctrlALUExtOp    <= `ALUOp_SLT;
+                ctrlALUSrc      <= `SEL_ALUSRC_IMM;
+                ctrlRegWrite    <= 1;
+                ctrlImmExtend   <= `EXT_MODE_UNSIGNED;
+            end
+
+            `INSTR_OP_SLTIU: begin
+                ctrlRegDst      <= `SEL_REGDST_RT;
+                ctrlMemToReg    <= `SEL_WB_ALUOUT;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
+                ctrlALUExtOp    <= `ALUOp_SLTU;
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
                 ctrlImmExtend   <= `EXT_MODE_SIGNED;
@@ -157,7 +177,7 @@ module ALUCtrl (
                    `INSTR_FUNCT_ADD: tempFunct <= `ALUOp_ADD;
                endcase
            end
-           `CtrlALUOp_EXFUNCT: tempFunct <= aluExtOp;
+           `CtrlALUOp_EXTOP: tempFunct <= aluExtOp;
        endcase 
     end
 
