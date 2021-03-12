@@ -72,30 +72,33 @@ module Ctrl (
                     // `INSTR_FUNCT_SLTU:
 
                     `INSTR_FUNCT_SLL: begin
-                        ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                        ctrlALUOp       <= `CtrlALUOp_FUNCT;
                         ctrlALUSrc1     <= `SEL_ALUSRC_IMM; // (Data1, IMMExt) -> IMMExt
                         ctrlALUSrc2     <= `SEL_ALUSRC_REG; // (Data2, IMMExt) -> Data2(rt)
-                        ctrlRegWrite    <= 1;
                         ctrlImmExtend   <= `EXT_MODE_UNSIGNED; // 无所谓
                     end
 
                     `INSTR_FUNCT_SRL: begin
-                        ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                        ctrlALUOp       <= `CtrlALUOp_FUNCT;
                         ctrlALUSrc1     <= `SEL_ALUSRC_IMM; // (Data1, IMMExt) -> IMMExt
                         ctrlALUSrc2     <= `SEL_ALUSRC_REG; // (Data2, IMMExt) -> Data2(rt)
-                        ctrlRegWrite    <= 1;
                         ctrlImmExtend   <= `EXT_MODE_UNSIGNED; // 无所谓
                     end
 
                     `INSTR_FUNCT_SRA: begin
-                        ctrlMemToReg    <= `SEL_WB_ALUOUT;
-                        ctrlALUOp       <= `CtrlALUOp_FUNCT;
                         ctrlALUSrc1     <= `SEL_ALUSRC_IMM; // (Data1, IMMExt) -> IMMExt
                         ctrlALUSrc2     <= `SEL_ALUSRC_REG; // (Data2, IMMExt) -> Data2(rt)
-                        ctrlRegWrite    <= 1;
                         ctrlImmExtend   <= `EXT_MODE_UNSIGNED; // 无所谓
+                    end
+
+                    `INSTR_FUNCT_SLLV: begin
+                        ctrlALUOp       <= `CtrlALUOp_FUNCT;
+                    end
+
+                    `INSTR_FUNCT_SRLV: begin
+                        ctrlALUOp       <= `CtrlALUOp_FUNCT;
+                    end
+
+                    `INSTR_FUNCT_SRAV: begin
+                        ctrlALUOp       <= `CtrlALUOp_FUNCT;
                     end
                 endcase
             end
@@ -259,6 +262,9 @@ module ALUCtrl (
                    `INSTR_FUNCT_SLL:    tempFunct <= `ALUOp_SLL;
                    `INSTR_FUNCT_SRL:    tempFunct <= `ALUOp_SRL;
                    `INSTR_FUNCT_SRA:    tempFunct <= `ALUOp_SRA;
+                   `INSTR_FUNCT_SLLV:   tempFunct <= `ALUOp_SLLV;
+                   `INSTR_FUNCT_SRLV:   tempFunct <= `ALUOp_SRLV;
+                   `INSTR_FUNCT_SRAV:   tempFunct <= `ALUOp_SRAV;
                endcase
            end
            `CtrlALUOp_EXTOP: tempFunct <= aluExtOp;
