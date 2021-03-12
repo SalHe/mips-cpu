@@ -27,8 +27,12 @@ module cpu_tb ();
         //     mipsCpu.aluSrc1, mipsCpu.aluSrc2, mipsCpu.aluOut,
         //     mipsCpu.ctrlRegWrite, mipsCpu.dataWriteToReg, mipsCpu.regWriteAddr
         // );
+        // $monitor("PC = %x, WB = %x, WBData = %x, RegWrite = %x", 
+        //     mipsCpu.PC, 
+        //     mipsCpu.ctrlRegWrite, mipsCpu.dataWriteToReg, mipsCpu.regWriteAddr
+        // );
         // $monitor("PC = %x, CODE = %x, OpCode = %x, Branch=%x-%x", 
-        //     mipsCpu.PC, mipsCpu.code, mipsCpu.opcode, mipsCpu.ctrlBranch, mipsCpu.branchTestResult
+        //     mipsCpu.PC, mipsCpu.code, mipsCpu.opcode, mipsCpu.ctrlNPCFrom, mipsCpu.branchTestResult
         // );
 
         // 让其执行指定周期数（用做测试）

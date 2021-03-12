@@ -24,7 +24,7 @@ module CPU #(
     
     // 控制信号
     wire [1:0] ctrlRegDst;
-    wire ctrlBranch;
+    wire [1:0] ctrlNPCFrom;
     wire ctrlMemRead;
     wire [1:0] ctrlMemToReg;
     wire [2:0] ctrlALUOp;
@@ -58,7 +58,7 @@ module CPU #(
     // always @(posedge clk) begin
     //     PC <= PC4;
     // end
-    NPC npc(clk, ctrlBranch, branchTestResult, PC, imm, PC4, PC);
+    NPC npc(clk, ctrlNPCFrom, branchTestResult, PC, imm, jaddrOri, PC4, PC);
 
     // 取指令
     IM #(.IM_DATA_FILE(IM_DATA_FILE)) 
@@ -78,7 +78,7 @@ module CPU #(
            opcode,
            func,
            ctrlRegDst,
-           ctrlBranch,
+           ctrlNPCFrom,
            ctrlMemRead,
            ctrlMemToReg,
            ctrlALUOp,

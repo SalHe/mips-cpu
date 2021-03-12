@@ -5,6 +5,7 @@
 `include "alu.v"
 `include "mux.v"
 `include "extend.v"
+`include "npc.v"
 
 
 // `define ALUOp_CALC_MEM_ADDRESS       2'b00
@@ -24,7 +25,7 @@ module Ctrl (
     input wire [5: 0] funct,
 
     output reg [1:0] ctrlRegDst,
-    output reg ctrlBranch,
+    output reg [1:0] ctrlNPCFrom,
     output reg ctrlMemRead,
     output reg [1:0] ctrlMemToReg,
     output reg [2:0] ctrlALUOp,
@@ -38,7 +39,7 @@ module Ctrl (
         
         // 默认值. 关闭所有写使能、不发生分支。
         ctrlRegDst      <= 2'b00;
-        ctrlBranch      <= 1'b0;
+        ctrlNPCFrom     <= 2'b00;
         ctrlMemRead     <= 1'b0;
         ctrlMemToReg    <= 2'b00;
         ctrlALUOp       <= 3'b000;
@@ -154,14 +155,14 @@ module Ctrl (
             end
 
             `INSTR_OP_BEQ: begin
-                ctrlBranch      <= 1;
+                ctrlNPCFrom     <= `NPC_BRANCH;
                 ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_EQL;
                 ctrlALUSrc      <= `SEL_ALUSRC_REG;
             end
 
             `INSTR_OP_BNE: begin
-                ctrlBranch      <= 1;
+                ctrlNPCFrom     <= `NPC_BRANCH;
                 ctrlALUOp       <= `CtrlALUOp_EXTOP;
                 ctrlALUExtOp    <= `ALUOp_BNE;
                 ctrlALUSrc      <= `SEL_ALUSRC_REG;
@@ -185,6 +186,17 @@ module Ctrl (
                 ctrlALUSrc      <= `SEL_ALUSRC_IMM;
                 ctrlRegWrite    <= 1;
                 ctrlImmExtend   <= `EXT_MODE_SIGNED;
+            end
+
+            `INSTR_OP_J: begin
+                ctrlNPCFrom     <= `NPC_JMP;
+            end
+
+            `INSTR_OP_JAL: begin
+                ctrlRegDst      <= `SEL_REGDST_RA;
+                ctrlNPCFrom     <= `NPC_JMP; // NPC_JAL
+                ctrlMemToReg    <= `SEL_WB_PC4;
+                ctrlRegWrite    <= 1;
             end
 
             // Unkown OpCode
