@@ -37,6 +37,7 @@ bin2hex: bin2hex.c
 		-DIM_DATA_FILE=\"$<\"		\
 		-DDEBUG_CPU					\
 		-DDUMP_FILE="\"$@.vcd\""	\
+		-DINS_NUMS=$(shell wc -l $< | awk {'print $$1'}) \
 		-g2005						\
 		-o $@ 						\
 		cpu_tb.v
@@ -47,3 +48,4 @@ clean:
 	-rm -r *.hex
 	-rm -r *.elf
 	-rm -r *.text
+	-rm -r *.vcd
