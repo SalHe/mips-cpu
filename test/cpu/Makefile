@@ -29,8 +29,8 @@ bin2hex: bin2hex.c
 	./bin2hex $< $@
 
 %.out: %.fv
-	# ./$< > $@
-	./$<
+	./$< > $@
+	# ./$<
 
 %.fv: %.hex cpu_tb.v $(VSRC)
 	iverilog -I../../				\
