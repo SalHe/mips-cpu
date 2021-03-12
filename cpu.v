@@ -9,6 +9,7 @@
 `include "ctrl.v"
 `include "alu.v"
 `include "dm.v"
+`include "extend.v"
 
 module CPU #(
     parameter IM_DATA_FILE = "im_data.txt"
@@ -65,6 +66,7 @@ module CPU #(
     wire ctrlMemWrite;
     wire ctrlALUSrc;
     wire ctrlRegWrite;
+    wire ctrlImmExtendMode;
     Ctrl ctrl(
            opcode,
            ctrlRegDst,
@@ -74,7 +76,8 @@ module CPU #(
            ctrlALUOp,
            ctrlMemWrite,
            ctrlALUSrc,
-           ctrlRegWrite
+           ctrlRegWrite,
+           ctrlImmExtendMode
     );
 
     // 选择写寄存器
@@ -107,7 +110,8 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] aluSrc1;
     wire [`WORD_WIDTH-1: 0] aluSrc2;
     wire [`WORD_WIDTH-1: 0] immSignedExtended;
-    assign immSignedExtended = {{16{imm[15]}}, imm};
+    // assign immSignedExtended = {{16{imm[15]}}, imm};
+    Extend immExter(imm, ctrlImmExtendMode, immSignedExtended);
     
     assign aluSrc2 = regOutData1;
     MUX2 #(.SEL_WIDTH(1)) 

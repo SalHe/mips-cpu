@@ -14,7 +14,8 @@ module Ctrl (
     output reg [1:0] ctrlALUOp,
     output reg ctrlMemWrite,
     output reg ctrlALUSrc,
-    output reg ctrlRegWrite
+    output reg ctrlRegWrite,
+    output reg ctrlImmExtend
 );
     always @(*) begin
         
