@@ -27,10 +27,10 @@ module RegFile #(
         `ifdef DEBUG_CPU
 			$display("     $v0,      $v1,      $t0,      $t1,      $t2,      $t3,      $t4,      $t5,      $t6,      $t7");
 			$monitor("%x, %x, %x, %x, %x, %x, %x, %x, %x, %x",
-					registers[2][31:0],	/* $v0 */
-					registers[3][31:0],	/* $v1 */
-					registers[8][31:0],	/* $t0 */
-					registers[9][31:0],	/* $t1 */
+					registers[2][31:0],	    /* $v0 */
+					registers[3][31:0],	    /* $v1 */
+					registers[8][31:0],	    /* $t0 */
+					registers[9][31:0],	    /* $t1 */
 					registers[10][31:0],	/* $t2 */
 					registers[11][31:0],	/* $t3 */
 					registers[12][31:0],	/* $t4 */
@@ -60,8 +60,8 @@ module RegFile #(
     assign outB = data2;
     
     always @(posedge clk) begin
-        if (toWrite) 
-            registers[regWriteAddr] <= dataToWrite;            
+        if (toWrite)
+            registers[regWriteAddr] = dataToWrite;
     end
 
 endmodule
