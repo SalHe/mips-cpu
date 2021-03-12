@@ -10,31 +10,31 @@
 `include "alu.v"
 `include "dm.v"
 `include "extend.v"
+`include "npc.v"
 
 module CPU #(
     parameter IM_DATA_FILE = "im_data.txt"
 )(
     input wire clk
 );
-
-    reg [31:0] PC;
+    // PC
+    wire reg [31:0] PC;
     wire [31:0] PC4;
     wire [31:0] code;
+    
+    // 控制信号
+    wire [1:0] ctrlRegDst;
+    wire ctrlBranch;
+    wire ctrlMemRead;
+    wire [1:0] ctrlMemToReg;
+    wire [2:0] ctrlALUOp;
+    wire [4:0] aluExtOp;
+    wire ctrlMemWrite;
+    wire ctrlALUSrc;
+    wire ctrlRegWrite;
+    wire ctrlImmExtendMode;
 
-    // 初始化
-    initial begin
-        PC <= 0;
-    end
-
-    assign PC4 = PC + 4;
-
-    always @(posedge clk) begin
-        PC <= PC4;
-    end
-
-    // 取指令
-    IM #(.IM_DATA_FILE(IM_DATA_FILE)) 
-        im(clk, PC, code);
+    wire branchTestResult;
 
     // 分析指令
     // | Bit#  | 31..26 | 25..21 | 20..16 | 15..11 | 10..6 | 5..0 |
@@ -48,6 +48,22 @@ module CPU #(
     wire [25: 0] jaddrOri;
     wire [5:0]   func;
 
+    // // 初始化
+    // initial begin
+    //     PC <= 0;
+    // end
+
+    // assign PC4 = PC + 4;
+
+    // always @(posedge clk) begin
+    //     PC <= PC4;
+    // end
+    NPC npc(clk, ctrlBranch, branchTestResult, PC, imm, PC4, PC);
+
+    // 取指令
+    IM #(.IM_DATA_FILE(IM_DATA_FILE)) 
+        im(clk, PC, code);
+
     assign opcode   = code[31:26];
     assign rs       = code[25:21];
     assign rt       = code[20:16];
@@ -58,16 +74,6 @@ module CPU #(
     assign jaddrOri = code[25:0];
 
     // 控制信号
-    wire [1:0] ctrlRegDst;
-    wire ctrlBranch;
-    wire ctrlMemRead;
-    wire [1:0] ctrlMemToReg;
-    wire [2:0] ctrlALUOp;
-    wire [4:0] aluExtOp;
-    wire ctrlMemWrite;
-    wire ctrlALUSrc;
-    wire ctrlRegWrite;
-    wire ctrlImmExtendMode;
     Ctrl ctrl(
            opcode,
            func,
@@ -128,9 +134,10 @@ module CPU #(
     // ALU运算
     wire [`WORD_WIDTH-1: 0] aluOut;
     wire [4: 0] aluOp;
-    wire aluZeroSign;
+    wire aluTestResult;
+    assign branchTestResult = aluTestResult;
     ALUCtrl aluCtrl(ctrlALUOp, func, aluExtOp, aluOp);                 // ALU功能选择
-    ALU alu(aluSrc1, aluSrc2, aluOp, aluOut, aluZeroSign);   // ALU运算
+    ALU alu(aluSrc1, aluSrc2, aluOp, aluOut, aluTestResult);   // ALU运算
 
     // RAM
     wire [`WORD_WIDTH-1: 0] memOutData;

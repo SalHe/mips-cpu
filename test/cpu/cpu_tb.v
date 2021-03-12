@@ -27,6 +27,9 @@ module cpu_tb ();
         //     mipsCpu.aluSrc1, mipsCpu.aluSrc2, mipsCpu.aluOut,
         //     mipsCpu.ctrlRegWrite, mipsCpu.dataWriteToReg, mipsCpu.regWriteAddr
         // );
+        // $monitor("PC = %x, CODE = %x, OpCode = %x, Branch=%x-%x", 
+        //     mipsCpu.PC, mipsCpu.code, mipsCpu.opcode, mipsCpu.ctrlBranch, mipsCpu.branchTestResult
+        // );
 
         // 让其执行指定周期数（用做测试）
         for (i = 0; i <= `INS_NUMS; i++) begin

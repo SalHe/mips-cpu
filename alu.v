@@ -35,7 +35,7 @@ module ALU
     input [4: 0] ALUOp,
 
     output reg [WORD_WIDTH-1: 0] out,
-    output reg zero
+    output reg testResult
 );
 
     always @(*) begin
@@ -51,6 +51,8 @@ module ALU
             `ALUOp_NOR:     out <= ~(inA | inB) ;
             `ALUOp_SLT:     out <= ($signed(inA) < $signed(inB)) ? 1 : 0;
             `ALUOp_SLTU:    out <= ($unsigned(inA) < $unsigned(inB)) ? 1 : 0;
+            `ALUOp_EQL:     testResult <= (inA == inB) ? 1 : 0;
+            `ALUOp_BNE:     testResult <= (inA != inB) ? 1 : 0;
             default: out <= 0;
         endcase
     end

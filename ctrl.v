@@ -153,6 +153,20 @@ module Ctrl (
                 ctrlImmExtend   <= `EXT_MODE_SIGNED;
             end
 
+            `INSTR_OP_BEQ: begin
+                ctrlBranch      <= 1;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
+                ctrlALUExtOp    <= `ALUOp_EQL;
+                ctrlALUSrc      <= `SEL_ALUSRC_REG;
+            end
+
+            `INSTR_OP_BNE: begin
+                ctrlBranch      <= 1;
+                ctrlALUOp       <= `CtrlALUOp_EXTOP;
+                ctrlALUExtOp    <= `ALUOp_BNE;
+                ctrlALUSrc      <= `SEL_ALUSRC_REG;
+            end
+
             `INSTR_OP_SLTI: begin
                 ctrlRegDst      <= `SEL_REGDST_RT;
                 ctrlMemToReg    <= `SEL_WB_ALUOUT;
