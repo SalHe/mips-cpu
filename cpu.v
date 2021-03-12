@@ -63,6 +63,7 @@ module CPU #(
     wire ctrlMemRead;
     wire [1:0] ctrlMemToReg;
     wire [2:0] ctrlALUOp;
+    wire [4:0] aluExtOp;
     wire ctrlMemWrite;
     wire ctrlALUSrc;
     wire ctrlRegWrite;
@@ -74,6 +75,7 @@ module CPU #(
            ctrlMemRead,
            ctrlMemToReg,
            ctrlALUOp,
+           aluExtOp,
            ctrlMemWrite,
            ctrlALUSrc,
            ctrlRegWrite,
@@ -126,7 +128,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] aluOut;
     wire [4: 0] aluOp;
     wire aluZeroSign;
-    ALUCtrl aluCtrl(ctrlALUOp, func, aluOp);                 // ALU功能选择
+    ALUCtrl aluCtrl(ctrlALUOp, func, aluExtOp, aluOp);                 // ALU功能选择
     ALU alu(aluSrc1, aluSrc2, aluOp, aluOut, aluZeroSign);   // ALU运算
 
     // RAM
