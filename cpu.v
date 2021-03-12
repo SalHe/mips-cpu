@@ -120,10 +120,10 @@ module CPU #(
 
     // ALU运算
     wire [`WORD_WIDTH-1: 0] aluOut;
-    wire [5: 0] aluFunct;
+    wire [5: 0] aluOp;
     wire aluZeroSign;
-    ALUCtrl aluCtrl(ctrlALUOp, func, aluFunct);                 // ALU功能选择
-    ALU alu(aluSrc1, aluSrc2, aluFunct, aluOut, aluZeroSign);   // ALU运算
+    ALUCtrl aluCtrl(ctrlALUOp, func, aluOp);                 // ALU功能选择
+    ALU alu(aluSrc1, aluSrc2, aluOp, aluOut, aluZeroSign);   // ALU运算
 
     // RAM
     wire [`WORD_WIDTH-1: 0] memOutData;

@@ -23,15 +23,15 @@ endmodule
 `define ALUOp_FUNCT_FROM_INSTRUCTION 2'b10
 
 module ALUCtrl (
-    input wire [1:0] ALUOp,
+    input wire [1:0] ctrlALUOp,
     input wire [5:0] funct,
-    output wire [5:0] outFunct
+    output wire [5:0] outALUOp
 );
 
     reg [5:0] tempFunct;
 
     always @(*) begin
-       case (ALUOp)
+       case (ctrlALUOp)
            // `ALUOp_CALC_MEM_ADDRESS:
            // `ALUOp_CALC_BRANCH_ADDRESS: 
            `ALUOp_FUNCT_FROM_INSTRUCTION: tempFunct = funct;
@@ -39,7 +39,7 @@ module ALUCtrl (
        endcase 
     end
 
-    assign outFunct = tempFunct;
+    assign outALUOp = tempFunct;
 
 endmodule
 
