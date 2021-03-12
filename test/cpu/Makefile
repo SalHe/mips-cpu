@@ -9,6 +9,9 @@ VSRC = $(shell ls ../../*.v)
 
 all: $(OBJS) $(HEXS) $(OUTS)
 
+view%: %.out
+	cat $<
+
 # %.out: %.fv
 # 	./$< > $<.out
 
