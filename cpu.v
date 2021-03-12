@@ -30,7 +30,8 @@ module CPU #(
     wire [2:0] ctrlALUOp;
     wire [4:0] aluExtOp;
     wire ctrlMemWrite;
-    wire ctrlALUSrc;
+    wire ctrlALUSrc1;
+    wire ctrlALUSrc2;
     wire ctrlRegWrite;
     wire ctrlImmExtendMode;
 
@@ -84,7 +85,8 @@ module CPU #(
            ctrlALUOp,
            aluExtOp,
            ctrlMemWrite,
-           ctrlALUSrc,
+           ctrlALUSrc1,
+           ctrlALUSrc2,
            ctrlRegWrite,
            ctrlImmExtendMode
     );
@@ -120,14 +122,21 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] aluSrc2;
     wire [`WORD_WIDTH-1: 0] immSignedExtended;
     // assign immSignedExtended = {{16{imm[15]}}, imm};
-    assign aluSrc1 = regOutData1;
+    // assign aluSrc1 = regOutData1;
     Extend immExter(imm, ctrlImmExtendMode, immSignedExtended);
-    
+        
     MUX2 #(.SEL_WIDTH(1)) 
-        muxALUSrc(
+        muxALUSrc1(
+            regOutData1, 
+            immSignedExtended,
+            ctrlALUSrc1,
+            aluSrc1
+        );
+    MUX2 #(.SEL_WIDTH(1)) 
+        muxALUSrc2(
             regOutData2, 
             immSignedExtended,
-            ctrlALUSrc,
+            ctrlALUSrc2,
             aluSrc2
         );
 

@@ -24,7 +24,10 @@
 `define ALUOp_SLL   5'b10001
 `define ALUOp_SRL   5'b10010
 `define ALUOp_SRA   5'b10011
-`define ALUOp_LUI   5'b10100
+`define ALUOp_SLLY  5'b10100
+`define ALUOp_SRLY  5'b10101
+`define ALUOp_SRAY  5'b10110
+`define ALUOp_LUI   5'b10111
 
 
 module ALU
@@ -51,6 +54,9 @@ module ALU
             `ALUOp_NOR:     out <= ~(inA | inB) ;
             `ALUOp_SLT:     out <= ($signed(inA) < $signed(inB)) ? 1 : 0;
             `ALUOp_SLTU:    out <= ($unsigned(inA) < $unsigned(inB)) ? 1 : 0;
+            `ALUOp_SLL:     out <= inB << inA[10:6];
+            `ALUOp_SRL:     out <= inB >> inA[10:6];
+            `ALUOp_SRA:     out <= $signed(inB) >>> inA[10:6];
             `ALUOp_EQL:     testResult <= (inA == inB) ? 1 : 0;
             `ALUOp_BNE:     testResult <= (inA != inB) ? 1 : 0;
             default: out <= 0;
