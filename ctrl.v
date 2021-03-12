@@ -42,13 +42,13 @@ module Ctrl (
 endmodule
 
 `define ALUOp_CALC_MEM_ADDRESS       2'b00
-`define ALUOp_CALC_BRANCH_ADDRESS    2'b10
 `define ALUOp_FUNCT_FROM_INSTRUCTION 2'b10
+`define ALUOp_CALC_BRANCH_ADDRESS    2'b11
 
 module ALUCtrl (
     input wire [1:0] ctrlALUOp,
     input wire [5:0] funct,
-    output wire [5:0] outALUOp
+    output wire [4:0] outALUOp
 );
 
     reg [5:0] tempFunct;

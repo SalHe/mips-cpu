@@ -32,7 +32,7 @@ module ALU
  (
     input [WORD_WIDTH-1: 0] inA,
     input [WORD_WIDTH-1: 0] inB,
-    input [5: 0] Funct,
+    input [4: 0] ALUOp,
 
     output reg [WORD_WIDTH-1: 0] out,
     output reg zero
@@ -40,7 +40,7 @@ module ALU
 
     always @(*) begin
         
-        case (Funct)
+        case (ALUOp)
             `ALUOp_ADD:   out = $signed(inA) + $signed(inB); 
             `ALUOp_ADDU:  out = $unsigned(inA) + $unsigned(inB); 
             `ALUOp_SUB:   out = $signed(inA) - $signed(inB); 
