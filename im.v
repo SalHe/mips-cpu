@@ -7,7 +7,7 @@ module IM #(
 ) (
     input wire clk,
     input wire [31: 0] PC,
-    output reg [31: 0] code
+    output wire [31: 0] code
 );
 
     reg [31: 0] imMem[MEM_SIZE-1: 0];
@@ -16,9 +16,11 @@ module IM #(
         $readmemh(IM_DATA_FILE, imMem, 0, MEM_SIZE-1);
     end
 
-    always @(posedge clk) begin
-        code <= imMem[PC[31:2]];
-    end
+    // always @(posedge clk) begin
+    //     code <= imMem[PC[31:2]];
+    // end
+
+    assign code = imMem[PC[31:2]];
 
 endmodule
 

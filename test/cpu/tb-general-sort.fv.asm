@@ -33,15 +33,11 @@ OutLoop:
         sw      $t7, 0($t5)
         sw      $t6, 4($t5)
         NotExchange:
-        # 现在需要加上额外指令才能得到正确结果，应该是BEQ指令出问题了。
-        # 等待调试后修正（OverInnerLoop处同）
-        addi    $t1, $t1, 0
         addi    $t1, $t1, 1
         j       InnerLoop
     
     OverInnerLoop:
 
-    addi    $t0, $t0, 0
     addi    $t0, $t0, 1
     j       OutLoop
 

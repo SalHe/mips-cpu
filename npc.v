@@ -30,6 +30,8 @@ module NPC(
             `NPC_BRANCH: begin
                 if (branchTest)
                     newPC <= PC4 + $signed({{16{imm[15]}}, imm[15:0]} << 2);
+                else
+                    newPC <= PC4;
             end 
             `NPC_JMP: newPC <= {newPC[31:28], jAddr[25:0], 2'b00};
             `NPC_REG: newPC <= regOutData;
