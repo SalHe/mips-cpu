@@ -14,7 +14,7 @@ module cpu_tb ();
     
     always begin
         clk <= ~clk;
-        #5;
+        #1;
     end
 
     initial begin
@@ -38,7 +38,8 @@ module cpu_tb ();
         // );
 
         // 让其执行指定周期数（用做测试）
-        for (i = 0; i <= `INS_NUMS; i++) begin
+        // 加上空周期，保证指令剩下的流水线级可以被执行
+        for (i = 0; i <= `INS_NUMS + 5; i++) begin
             @(posedge clk);
         end
 

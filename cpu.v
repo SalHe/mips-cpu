@@ -101,10 +101,11 @@ module CPU #(
     );
 
     // 选择写寄存器
-    wire [4: 0] regWriteAddr;
+    wire [4: 0] regWriteAddr_Final; // assign ... = ..._MEM_WB
+    wire [`WORD_WIDTH-1: 0] dataWriteToReg_Final; // assign ... = ..._MEM_WB
+    wire ctrlRegWrite_Final; // assign ... = ..._MEM_WB
 
     // 与寄存器相连
-    wire [`WORD_WIDTH-1: 0] dataWriteToReg;
     // wire [`WORD_WIDTH-1: 0] regOutData1; //向前定义了
     wire [`WORD_WIDTH-1: 0] regOutData2;
     RegFile regFile(
@@ -112,9 +113,9 @@ module CPU #(
 
         rs, rt,          // Read Addr
 
-        regWriteAddr,    // Write Addr
-        dataWriteToReg,  // Data to write
-        ctrlRegWrite,     // Whether to write
+        regWriteAddr_Final,    // Write Addr
+        dataWriteToReg_Final,  // Data to write
+        ctrlRegWrite_Final,     // Whether to write
 
         regOutData1,     // Out data
         regOutData2
@@ -195,7 +196,7 @@ module CPU #(
 
                 // WB RegDst
                 rt_ID_EX,
-                rt_ID_EX,
+                rd_ID_EX,
 
                 // MEM from Control
                 ctrlNPCFrom_ID_EX,
@@ -240,12 +241,13 @@ module CPU #(
         );
 
     // 选择写寄存器
+    wire [4: 0] regWriteAddr;
     wire [4: 0] regWriteAddr_EX_MEM;
     MUX2C #(.WORD_WIDTH(5), .CONSTANT(31)) 
         muxRegDst(
             rt_ID_EX, rd_ID_EX,
-            ctrlRegDst_ID_EX,        
-            regWriteAddr_EX_MEM
+            ctrlRegDst_ID_EX,
+            regWriteAddr
         );
 
     // ALU运算
@@ -291,7 +293,7 @@ module CPU #(
                 branchTestResult,
                 aluOut,
                 regOutData2,
-                regWriteAddr_EX_MEM
+                regWriteAddr
             },
             
             // Next stage(EX)
@@ -405,9 +407,12 @@ module CPU #(
             memOutData_MEM_WB,
             PC4_MEM_WB,
             ctrlMemToReg_MEM_WB,
-            dataWriteToReg
+            dataWriteToReg_Final
         );
-    assign regWriteAddr = regWriteAddr_MEM_WB;
+
+    assign regWriteAddr_Final = regWriteAddr_MEM_WB;
+    assign ctrlRegWrite_Final = ctrlRegWrite_MEM_WB;
+
 
 endmodule
 
