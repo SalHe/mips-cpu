@@ -6,8 +6,8 @@ module PipelineReg #(
 ) (
     input wire clk,
     input wire reset,
-    input wire toSave,
-    output reg holder
+    input wire [WIDTH-1: 0] toSave,
+    output reg [WIDTH-1: 0] holder
 );
 
     always @(posedge clk ) begin
