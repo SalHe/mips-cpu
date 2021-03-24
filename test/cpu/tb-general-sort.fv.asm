@@ -107,15 +107,15 @@ LoadVars:
 #       a1 给定数目
 # 返回：v0 基址
 ViewVars:
-        add     $t0, $zero, $zero
+        add     $t8, $zero, $zero
 
     Loop:
 
-        beq     $t0, $a1, OverLoop
-        sll     $t1, $t0, 2
-        add     $t2, $t1, $a0
-        lw      $t7, 0($t2)
-        addi    $t0, $t0, 1
+        beq     $t8, $a1, OverLoop
+        sll     $t9, $t8, 2
+        add     $a2, $t9, $a0
+        lw      $t7, 0($a2)
+        addi    $t8, $t8, 1
         j       Loop
 
     OverLoop: 
