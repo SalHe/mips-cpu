@@ -34,7 +34,6 @@ module CPU #(
     wire ctrlALUSrc2;
     wire ctrlRegWrite;
     wire ctrlImmExtendMode;
-
     wire branchTestResult;
 
     // 分析指令
@@ -49,16 +48,6 @@ module CPU #(
     wire [25: 0] jaddrOri;
     wire [5:0]   func;
 
-    // // 初始化
-    // initial begin
-    //     PC <= 0;
-    // end
-
-    // assign PC4 = PC + 4;
-
-    // always @(posedge clk) begin
-    //     PC <= PC4;
-    // end
     wire [`WORD_WIDTH-1: 0] regOutData1;
     NPC npc(clk, ctrlNPCFrom, branchTestResult, PC, regOutData1, imm, jaddrOri, PC4, PC);
 
