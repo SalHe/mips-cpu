@@ -98,7 +98,7 @@ LoadVars:
     ori     $at, $at, 0x8000
     sw      $at, 20($a0)        # FFFF8000
 
-    addi    $v0, $zero, 5
+    addi    $v0, $zero, 6
     jr      $ra
 
 
