@@ -19,21 +19,6 @@ module CPU #(
     input wire clk,
     input wire reset
 );
-    
-    // 控制信号
-    wire [1:0] ctrlRegDst;
-    wire [1:0] ctrlNPCFrom;
-    wire ctrlMemRead;
-    wire [1:0] ctrlMemToReg;
-    wire [2:0] ctrlALUOp;
-    wire [4:0] aluExtOp;
-    wire ctrlMemWrite;
-    wire ctrlALUSrc1;
-    wire ctrlALUSrc2;
-    wire ctrlRegWrite;
-    wire ctrlImmExtendMode;
-    wire branchTestResult;
-
     // -----------------------------------------------------------------
     // Stage IF
 
@@ -54,8 +39,14 @@ module CPU #(
     wire [25: 0] jaddrOri;
     wire [5:0]   func;
 
-    wire [`WORD_WIDTH-1: 0] regOutData1;
-    NPC npc(clk, ctrlNPCFrom, branchTestResult, PC, regOutData1, imm, jaddrOri, PC4, PC);
+    wire [1: 0] ctrlNPCFrom_Final;
+    wire branchTestResult_Final;
+    wire [`WORD_WIDTH-1: 0] regOutData1_Final;
+    wire [15: 0] imm_Final;
+    wire [25: 0] jAddrOri_Final;
+
+    NPC npc(clk, ctrlNPCFrom_Final, branchTestResult_Final, PC, regOutData1_Final, imm_Final, jAddrOri_Final, PC4, PC);
+    
 
     // 取指令
     IM #(.IM_DATA_FILE(IM_DATA_FILE)) 
@@ -82,8 +73,21 @@ module CPU #(
     assign func     = code_IF_ID[5:0];
     assign imm      = code_IF_ID[15:0];
     assign jaddrOri = code_IF_ID[25:0];
-
+    
     // 控制信号
+    wire [1:0] ctrlRegDst;
+    wire [1:0] ctrlNPCFrom;
+    wire ctrlMemRead;
+    wire [1:0] ctrlMemToReg;
+    wire [2:0] ctrlALUOp;
+    wire [4:0] aluExtOp;
+    wire ctrlMemWrite;
+    wire ctrlALUSrc1;
+    wire ctrlALUSrc2;
+    wire ctrlRegWrite;
+    wire ctrlImmExtendMode;
+
+    // 控制信号单元
     Ctrl ctrl(
            opcode,
            func,
@@ -106,7 +110,7 @@ module CPU #(
     wire ctrlRegWrite_Final; // assign ... = ..._MEM_WB
 
     // 与寄存器相连
-    // wire [`WORD_WIDTH-1: 0] regOutData1; //向前定义了
+    wire [`WORD_WIDTH-1: 0] regOutData1; 
     wire [`WORD_WIDTH-1: 0] regOutData2;
     RegFile regFile(
         clk,             // Clock
@@ -270,9 +274,10 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] PC4_EX_MEM;
     wire branchTestResult_EX_MEM;
     wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;
+    wire [`WORD_WIDTH-1: 0] regOutData1_EX_MEM;
     wire [`WORD_WIDTH-1: 0] regOutData2_EX_MEM;
     
-    PipelineReg #(.WIDTH(111))
+    PipelineReg #(.WIDTH(143))
         PipelineReg_EX_MEM(clk, reset,
 
             // From previous stage
@@ -292,7 +297,8 @@ module CPU #(
                 PC4_ID_EX,
                 branchTestResult,
                 aluOut,
-                regOutData2,
+                regOutData1_ID_EX,
+                regOutData2_ID_EX,
                 regWriteAddr
             },
             
@@ -312,6 +318,7 @@ module CPU #(
                 PC4_EX_MEM,
                 branchTestResult_EX_MEM,
                 aluOut_EX_MEM,
+                regOutData1_EX_MEM,
                 regOutData2_EX_MEM,
                 regWriteAddr_EX_MEM
             }
@@ -350,11 +357,12 @@ module CPU #(
 
     wire [`WORD_WIDTH-1: 0] PC4_MEM_WB;
     wire [`WORD_WIDTH-1: 0] aluOut_MEM_WB;
+    wire [`WORD_WIDTH-1: 0] regOutData1_MEM_WB;
     wire [`WORD_WIDTH-1: 0] regOutData2_MEM_WB;
     wire [4: 0] regWriteAddr_MEM_WB;
     wire [`WORD_WIDTH-1: 0] memOutData_MEM_WB;
     
-    PipelineReg #(.WIDTH(140))
+    PipelineReg #(.WIDTH(172))
         PipelineReg_MEM_WB(clk, reset,
 
             // From previous stage
@@ -371,6 +379,7 @@ module CPU #(
                 // Others
                 PC4_EX_MEM,
                 aluOut_EX_MEM,
+                regOutData1_EX_MEM,
                 regOutData2_EX_MEM,
                 regWriteAddr_EX_MEM,
                 memOutData
@@ -389,6 +398,7 @@ module CPU #(
                 // Others
                 PC4_MEM_WB,
                 aluOut_MEM_WB,
+                regOutData1_MEM_WB,
                 regOutData2_MEM_WB,
                 regWriteAddr_MEM_WB,
                 memOutData_MEM_WB
@@ -410,9 +420,10 @@ module CPU #(
             dataWriteToReg_Final
         );
 
+    assign ctrlNPCFrom_Final  = ctrlNPCFrom_MEM_WB;
     assign regWriteAddr_Final = regWriteAddr_MEM_WB;
     assign ctrlRegWrite_Final = ctrlRegWrite_MEM_WB;
-
+    assign regDataOut1_Final  = regOutData1_MEM_WB;
 
 endmodule
 
