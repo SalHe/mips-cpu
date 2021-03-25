@@ -45,6 +45,8 @@ module RegFile #(
     always @(*) begin
         if (regReadAddr1 == 0)
             data1 = 0;
+        else if(regReadAddr1 == regWriteAddr && toWrite)
+            data1 = dataToWrite;
         else
             data1 = registers[regReadAddr1];
     end
@@ -52,6 +54,8 @@ module RegFile #(
     always @(*) begin
         if (regReadAddr2 == 0)
             data2 = 0;
+        else if(regReadAddr2 == regWriteAddr && toWrite)
+            data2 = dataToWrite;
         else
             data2 = registers[regReadAddr2];
     end
