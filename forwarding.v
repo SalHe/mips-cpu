@@ -2,6 +2,7 @@
 `define _FORWARDING_V_
 
 `include "mux.v"
+`include "ctrl.v"
 
 module Forwarding (
     input  wire [4: 0] rs,
@@ -33,9 +34,9 @@ module Forwarding (
     end
 
     always @(*) begin
-        if(rt == rd_EX_MEM && ctrlRegWrite_EX_MEM)
+        if(rt == rd_EX_MEM && ctrlRegWrite_EX_MEM && ctrlALUSrc2_ID_EX != `SEL_ALUSRC_IMM)
             sel2 <= `SEL_ALUSRC_EX;
-        else if(rt == rd_MEM_WB && ctrlRegWrite_MEM_WB)
+        else if(rt == rd_MEM_WB && ctrlRegWrite_MEM_WB && ctrlALUSrc2_ID_EX != `SEL_ALUSRC_IMM)
             sel2 <= `SEL_ALUSRC_WB;
         else
             sel2 <= ctrlALUSrc2_ID_EX;    
