@@ -356,7 +356,7 @@ module CPU #(
     wire branchTestResult_EX_MEM;
     // wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;   // 向前定义
     wire [`WORD_WIDTH-1: 0] regOutData1_EX_MEM;
-    wire [`WORD_WIDTH-1: 0] regOutData2_EX_MEM;
+    wire [`WORD_WIDTH-1: 0] regOutData2_Forwarded_EX_MEM;
     
     PipelineReg #(.WIDTH(143))
         PipelineReg_EX_MEM(clk, ,
@@ -379,7 +379,7 @@ module CPU #(
                 branchTestResult,
                 aluOut,
                 regOutData1_ID_EX,
-                regOutData2_ID_EX,
+                regOutData2_Forwarded,
                 regWriteAddr
             },
             
@@ -400,7 +400,7 @@ module CPU #(
                 branchTestResult_EX_MEM,
                 aluOut_EX_MEM,
                 regOutData1_EX_MEM,
-                regOutData2_EX_MEM,
+                regOutData2_Forwarded_EX_MEM,
                 regWriteAddr_EX_MEM
             }
         
@@ -415,8 +415,7 @@ module CPU #(
         clk,
 
         aluOut_EX_MEM,             // Mem Addr
-        // regOutData2_EX_MEM,        // Data to write
-        regOutData2_Forwarded,
+        regOutData2_Forwarded_EX_MEM,        // Data to write
 
         ctrlMemWrite_EX_MEM,       // 写使能
         ctrlMemRead_EX_MEM,        // 读使能
@@ -462,7 +461,7 @@ module CPU #(
                 PC4_EX_MEM,
                 aluOut_EX_MEM,
                 regOutData1_EX_MEM,
-                regOutData2_EX_MEM,
+                regOutData2_Forwarded_EX_MEM,
                 regWriteAddr_EX_MEM,
                 memOutData
             },
