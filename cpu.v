@@ -12,6 +12,7 @@
 `include "extend.v"
 `include "npc.v"
 `include "pipeline_reg.v"
+`include "forwarding.v"
 
 module CPU #(
     parameter IM_DATA_FILE = "im_data.txt"
@@ -82,8 +83,8 @@ module CPU #(
     wire [2:0] ctrlALUOp;
     wire [4:0] aluExtOp;
     wire ctrlMemWrite;
-    wire ctrlALUSrc1;
-    wire ctrlALUSrc2;
+    wire [1:0] ctrlALUSrc1;
+    wire [1:0] ctrlALUSrc2;
     wire ctrlRegWrite;
     wire ctrlImmExtendMode;
 
@@ -142,13 +143,14 @@ module CPU #(
 
     wire [2:0] ctrlALUOp_ID_EX;
     wire [4:0] aluExtOp_ID_EX;
-    wire ctrlALUSrc1_ID_EX;
-    wire ctrlALUSrc2_ID_EX;
+    wire [1:0] ctrlALUSrc1_ID_EX;
+    wire [1:0] ctrlALUSrc2_ID_EX;
 
     wire [`WORD_WIDTH-1: 0] regOutData1_ID_EX;
     wire [`WORD_WIDTH-1: 0] regOutData2_ID_EX;
     wire [`WORD_WIDTH-1: 0] immSignedExtended_ID_EX;
 
+    wire [4: 0] rs_ID_EX;
     wire [4: 0] rt_ID_EX;
     wire [4: 0] rd_ID_EX;
 
@@ -156,7 +158,7 @@ module CPU #(
 
     wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
 
-    PipelineReg #(.WIDTH(163))
+    PipelineReg #(.WIDTH(170))
         PipelineReg_ID_EX(clk, reset,
 
             // From previous stage
@@ -168,6 +170,7 @@ module CPU #(
                 ctrlMemToReg,
 
                 // WB RegDst
+                rs,
                 rt,
                 rd,
 
@@ -199,6 +202,7 @@ module CPU #(
                 ctrlMemToReg_ID_EX,
 
                 // WB RegDst
+                rs_ID_EX,
                 rt_ID_EX,
                 rd_ID_EX,
 
@@ -226,27 +230,71 @@ module CPU #(
     // -----------------------------------------------------------------
     // Stage EX
 
+    // Forwarding
+    wire [1: 0] selAluSrc1;
+    wire [1: 0] selAluSrc2;
+    wire ctrlRegWrite_EX_MEM;
+    wire ctrlRegWrite_MEM_WB;
+    wire [4: 0] regWriteAddr_MEM_WB;
+    wire [4: 0] regWriteAddr_EX_MEM;
+    Forwarding forwading(
+        rs_ID_EX,
+        rt_ID_EX,
+
+        ctrlALUSrc1_ID_EX,
+        ctrlALUSrc2_ID_EX,
+
+        ctrlRegWrite_EX_MEM,
+        ctrlRegWrite_MEM_WB,
+
+        regWriteAddr_EX_MEM,
+        regWriteAddr_MEM_WB,
+
+        selAluSrc1,
+        selAluSrc2
+    );
+
     // 给ALU提供源操作数
     wire [`WORD_WIDTH-1: 0] aluSrc1;
     wire [`WORD_WIDTH-1: 0] aluSrc2;
-    MUX2 #(.SEL_WIDTH(1)) 
-        muxALUSrc1(
+    // MUX2 #(.SEL_WIDTH(1)) 
+    //     muxALUSrc1(
+    //         regOutData1_ID_EX, 
+    //         immSignedExtended_ID_EX,
+    //         ctrlALUSrc1_ID_EX,
+    //         aluSrc1
+    //     );
+    // MUX2 #(.SEL_WIDTH(1)) 
+    // muxALUSrc2(
+    //     regOutData2_ID_EX,
+    //     immSignedExtended_ID_EX,
+    //     ctrlALUSrc2_ID_EX,
+    //     aluSrc2
+    // );
+    wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;
+    MUX4 muxALUSrc1(
             regOutData1_ID_EX, 
             immSignedExtended_ID_EX,
-            ctrlALUSrc1_ID_EX,
+            aluOut_EX_MEM,
+            dataWriteToReg_Final,
+
+            selAluSrc1,
             aluSrc1
         );
-    MUX2 #(.SEL_WIDTH(1)) 
-        muxALUSrc2(
-            regOutData2_ID_EX,
+    MUX4 muxALUSrc2(
+            regOutData2_ID_EX, 
             immSignedExtended_ID_EX,
-            ctrlALUSrc2_ID_EX,
+            aluOut_EX_MEM,
+            dataWriteToReg_Final,
+
+            selAluSrc2,
             aluSrc2
         );
 
+
     // 选择写寄存器
     wire [4: 0] regWriteAddr;
-    wire [4: 0] regWriteAddr_EX_MEM;
+    // wire [4: 0] regWriteAddr_EX_MEM;     // 向前定义
     MUX2C #(.WORD_WIDTH(5), .CONSTANT(31)) 
         muxRegDst(
             rt_ID_EX, rd_ID_EX,
@@ -264,7 +312,7 @@ module CPU #(
 
     // Pipeline
     wire [1:0] ctrlRegDst_EX_MEM;
-    wire ctrlRegWrite_EX_MEM;
+    // wire ctrlRegWrite_EX_MEM;    // 向前定义
     wire [1:0] ctrlMemToReg_EX_MEM;
 
     wire [1:0] ctrlNPCFrom_EX_MEM;
@@ -273,7 +321,7 @@ module CPU #(
 
     wire [`WORD_WIDTH-1: 0] PC4_EX_MEM;
     wire branchTestResult_EX_MEM;
-    wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;
+    // wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;   // 向前定义
     wire [`WORD_WIDTH-1: 0] regOutData1_EX_MEM;
     wire [`WORD_WIDTH-1: 0] regOutData2_EX_MEM;
     
@@ -345,7 +393,7 @@ module CPU #(
 
     // Pipeline
     wire [1:0] ctrlRegDst_MEM_WB;
-    wire ctrlRegWrite_MEM_WB;
+    // wire ctrlRegWrite_MEM_WB; // 向前定义
     wire [1:0] ctrlMemToReg_MEM_WB;
 
     wire [1:0] ctrlNPCFrom_MEM_WB;
@@ -359,7 +407,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] aluOut_MEM_WB;
     wire [`WORD_WIDTH-1: 0] regOutData1_MEM_WB;
     wire [`WORD_WIDTH-1: 0] regOutData2_MEM_WB;
-    wire [4: 0] regWriteAddr_MEM_WB;
+    // wire [4: 0] regWriteAddr_MEM_WB;     // 向前定义
     wire [`WORD_WIDTH-1: 0] memOutData_MEM_WB;
     
     PipelineReg #(.WIDTH(172))
