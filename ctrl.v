@@ -31,8 +31,8 @@ module Ctrl (
     output reg [2:0] ctrlALUOp,
     output reg [4:0] ctrlALUExtOp,
     output reg ctrlMemWrite,
-    output reg [1:0] ctrlALUSrc1,
-    output reg [1:0] ctrlALUSrc2,
+    output reg ctrlALUSrc1,
+    output reg ctrlALUSrc2,
     output reg ctrlRegWrite,
     output reg ctrlImmExtend
 );

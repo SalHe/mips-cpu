@@ -8,17 +8,14 @@ module Forwarding (
     input  wire [4: 0] rs,
     input  wire [4: 0] rt,
 
-    input  wire [1:0] ctrlALUSrc1_ID_EX,
-    input  wire [1:0] ctrlALUSrc2_ID_EX,
-
     input  wire        ctrlRegWrite_EX_MEM,
     input  wire        ctrlRegWrite_MEM_WB,
 
     input  wire [4: 0] rd_EX_MEM,
     input  wire [4: 0] rd_MEM_WB,
     
-    output wire [1: 0] selAluSrc1,   // rs
-    output wire [1: 0] selAluSrc2    // rt
+    output wire [1: 0] forward1,   // rs
+    output wire [1: 0] forward2    // rt
 );
 
     reg [1: 0] sel1;
@@ -47,24 +44,24 @@ module Forwarding (
 
     always @(*) begin
         if(rs == rd_EX_MEM && ctrlRegWrite_EX_MEM)
-            sel1 <= `SEL_ALUSRC_EX;
+            sel1 <= `SEL_FORWARD_EX;
         else if(rs == rd_MEM_WB && ctrlRegWrite_MEM_WB)
-            sel1 <= `SEL_ALUSRC_WB;
+            sel1 <= `SEL_FORWARD_MEM;
         else
-            sel1 <= ctrlALUSrc1_ID_EX;    
+            sel1 <= `SEL_FORWARD_RAW;    
     end
 
     always @(*) begin
-        if(rt == rd_EX_MEM && ctrlRegWrite_EX_MEM && ctrlALUSrc2_ID_EX != `SEL_ALUSRC_IMM)
-            sel2 <= `SEL_ALUSRC_EX;
-        else if(rt == rd_MEM_WB && ctrlRegWrite_MEM_WB && ctrlALUSrc2_ID_EX != `SEL_ALUSRC_IMM)
-            sel2 <= `SEL_ALUSRC_WB;
+        if(rt == rd_EX_MEM && ctrlRegWrite_EX_MEM)
+            sel2 <= `SEL_FORWARD_EX;
+        else if(rt == rd_MEM_WB && ctrlRegWrite_MEM_WB)
+            sel2 <= `SEL_FORWARD_MEM;
         else
-            sel2 <= ctrlALUSrc2_ID_EX;    
+            sel2 <= `SEL_FORWARD_RAW;    
     end
 
-    assign selAluSrc1 = sel1;
-    assign selAluSrc2 = sel2;
+    assign forward1 = sel1;
+    assign forward2 = sel2;
     
 endmodule
 

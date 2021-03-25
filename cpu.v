@@ -90,8 +90,8 @@ module CPU #(
     wire [2:0] ctrlALUOp;
     wire [4:0] aluExtOp;
     wire ctrlMemWrite;
-    wire [1:0] ctrlALUSrc1;
-    wire [1:0] ctrlALUSrc2;
+    wire ctrlALUSrc1;
+    wire ctrlALUSrc2;
     wire ctrlRegWrite;
     wire ctrlImmExtendMode;
 
@@ -161,8 +161,8 @@ module CPU #(
 
     wire [2:0] ctrlALUOp_ID_EX;
     wire [4:0] aluExtOp_ID_EX;
-    wire [1:0] ctrlALUSrc1_ID_EX;
-    wire [1:0] ctrlALUSrc2_ID_EX;
+    wire ctrlALUSrc1_ID_EX;
+    wire ctrlALUSrc2_ID_EX;
 
     wire [`WORD_WIDTH-1: 0] regOutData1_ID_EX;
     wire [`WORD_WIDTH-1: 0] regOutData2_ID_EX;
@@ -176,7 +176,7 @@ module CPU #(
 
     wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
 
-    PipelineReg #(.WIDTH(170))
+    PipelineReg #(.WIDTH(168))
         PipelineReg_ID_EX(clk, stall_ID,
 
             // From previous stage
@@ -249,8 +249,8 @@ module CPU #(
     // Stage EX
 
     // Forwarding
-    wire [1: 0] selAluSrc1;
-    wire [1: 0] selAluSrc2;
+    wire [1: 0] forwardA;
+    wire [1: 0] forwardB;
     wire ctrlRegWrite_EX_MEM;
     wire ctrlRegWrite_MEM_WB;
     wire [4: 0] regWriteAddr_MEM_WB;
@@ -259,55 +259,70 @@ module CPU #(
         rs_ID_EX,
         rt_ID_EX,
 
-        ctrlALUSrc1_ID_EX,
-        ctrlALUSrc2_ID_EX,
-
         ctrlRegWrite_EX_MEM,
         ctrlRegWrite_MEM_WB,
 
         regWriteAddr_EX_MEM,
         regWriteAddr_MEM_WB,
 
-        selAluSrc1,
-        selAluSrc2
+        forwardA,
+        forwardB
+    );
+
+    // 处理寄存器数据的转发
+    wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;
+    wire [`WORD_WIDTH-1: 0] regOutData1_Forwarded;
+    wire [`WORD_WIDTH-1: 0] regOutData2_Forwarded;
+    MUX3 muxForward1(
+        regOutData1_ID_EX,
+        aluOut_EX_MEM,
+        dataWriteToReg_Final,
+        forwardA,
+        regOutData1_Forwarded
+    );
+    MUX3 muxForward2(
+        regOutData2_ID_EX,
+        aluOut_EX_MEM,
+        dataWriteToReg_Final,
+        forwardB,
+        regOutData2_Forwarded
     );
 
     // 给ALU提供源操作数
     wire [`WORD_WIDTH-1: 0] aluSrc1;
     wire [`WORD_WIDTH-1: 0] aluSrc2;
-    // MUX2 #(.SEL_WIDTH(1)) 
-    //     muxALUSrc1(
-    //         regOutData1_ID_EX, 
-    //         immSignedExtended_ID_EX,
-    //         ctrlALUSrc1_ID_EX,
-    //         aluSrc1
-    //     );
-    // MUX2 #(.SEL_WIDTH(1)) 
-    // muxALUSrc2(
-    //     regOutData2_ID_EX,
-    //     immSignedExtended_ID_EX,
-    //     ctrlALUSrc2_ID_EX,
-    //     aluSrc2
-    // );
-    wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;
-    MUX4 muxALUSrc1(
-            regOutData1_ID_EX, 
+    MUX2 #(.SEL_WIDTH(1)) 
+        muxALUSrc1(
+            regOutData1_Forwarded, 
             immSignedExtended_ID_EX,
-            aluOut_EX_MEM,
-            dataWriteToReg_Final,
-
-            selAluSrc1,
+            ctrlALUSrc1_ID_EX,
             aluSrc1
         );
-    MUX4 muxALUSrc2(
-            regOutData2_ID_EX, 
+    MUX2 #(.SEL_WIDTH(1)) 
+        muxALUSrc2(
+            regOutData2_Forwarded,
             immSignedExtended_ID_EX,
-            aluOut_EX_MEM,
-            dataWriteToReg_Final,
-
-            selAluSrc2,
+            ctrlALUSrc2_ID_EX,
             aluSrc2
         );
+    // MUX4 muxALUSrc1(
+    //         regOutData1_ID_EX, 
+    //         immSignedExtended_ID_EX,
+    //         aluOut_EX_MEM,
+    //         dataWriteToReg_Final,
+
+    //         selAluSrc1,
+    //         aluSrc1
+    //     );
+    // MUX4 muxALUSrc2(
+    //         regOutData2_ID_EX, 
+    //         immSignedExtended_ID_EX,
+    //         aluOut_EX_MEM,
+    //         dataWriteToReg_Final,
+
+    //         selAluSrc2,
+    //         aluSrc2
+    //     );
 
 
     // 选择写寄存器
@@ -400,7 +415,8 @@ module CPU #(
         clk,
 
         aluOut_EX_MEM,             // Mem Addr
-        regOutData2_EX_MEM,        // Data to write
+        // regOutData2_EX_MEM,        // Data to write
+        regOutData2_Forwarded,
 
         ctrlMemWrite_EX_MEM,       // 写使能
         ctrlMemRead_EX_MEM,        // 读使能

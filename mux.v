@@ -7,14 +7,16 @@
 `define SEL_REGDST_RD   2'b01   // 写回到指令中指定的rd号寄存器
 `define SEL_REGDST_RA   2'b10   // 写回到$ra（31号寄存器）
 
-`define SEL_ALUSRC_REG  2'b00   // 以指令中给定的源寄存器号中的内容作为操作数2
-`define SEL_ALUSRC_IMM  2'b01   // 以指令中给定的立即数作为操作数2
-`define SEL_ALUSRC_EX   2'b10
-`define SEL_ALUSRC_WB   2'b11
+`define SEL_ALUSRC_REG  1'b0   // 以指令中给定的源寄存器号中的内容作为操作数2
+`define SEL_ALUSRC_IMM  1'b1   // 以指令中给定的立即数作为操作数2
 
 `define SEL_WB_ALUOUT   2'b00   // 将ALU运算结果写回
 `define SEL_WB_DM       2'b01   // 将DM读出的结果写回
 `define SEL_WB_PC4      2'b10   // 将PC4写回
+
+`define SEL_FORWARD_RAW 2'b00   // 无需转发
+`define SEL_FORWARD_EX  2'b01   // 转发EX结果
+`define SEL_FORWARD_MEM 2'b10   // 转发MEM结果
 
 module MUX2 #(
     parameter WORD_WIDTH = `WORD_WIDTH,
