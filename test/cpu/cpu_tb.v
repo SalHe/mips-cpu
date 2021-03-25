@@ -7,10 +7,9 @@ module cpu_tb ();
 
     integer i = 0;
     reg clk;
-    reg reset;
 
     CPU #(`IM_DATA_FILE)
-        mipsCpu(clk, reset);
+        mipsCpu(clk);
     
     always begin
         clk <= ~clk;
@@ -22,7 +21,6 @@ module cpu_tb ();
         $dumpvars(0, cpu_tb);
 
         clk <= 0;
-        reset <= 0;
 
         // $monitor("PC = %x, CODE = %x, OpCode = %x, ALUSrc1 = %x, ALUSrc2 = %x, ALUOut = %x, WB = %x, WBData = %x, RegWrite = %x", 
         //     mipsCpu.PC, mipsCpu.code, mipsCpu.opcode, 

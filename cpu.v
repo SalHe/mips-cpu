@@ -13,12 +13,12 @@
 `include "npc.v"
 `include "pipeline_reg.v"
 `include "forwarding.v"
+`include "hazard.v"
 
 module CPU #(
     parameter IM_DATA_FILE = "im_data.txt"
 )(
-    input wire clk,
-    input wire reset
+    input wire clk
 );
     // -----------------------------------------------------------------
     // Stage IF
@@ -58,7 +58,7 @@ module CPU #(
     wire [31: 0] PC4_IF_ID;
     wire [31: 0] code_IF_ID;
     PipelineReg #(.WIDTH(64))
-        PipelineReg_IF_ID(clk, reset,
+        PipelineReg_IF_ID(clk, 1'b0,
             {PC4,       code},
             {PC4_IF_ID, code_IF_ID}
         );
@@ -105,6 +105,17 @@ module CPU #(
            ctrlImmExtendMode
     );
 
+    // 冒险检测
+    wire stall_ID;
+    wire [4: 0] rt_ID_EX;
+    wire ctrlMemRead_ID_EX;
+    HazardDetect hazardDetect(
+        ctrlMemRead_ID_EX,
+        rt_ID_EX,
+        rs, rt,
+        stall_ID
+    );
+
     // 选择写寄存器
     wire [4: 0] regWriteAddr_Final; // assign ... = ..._MEM_WB
     wire [`WORD_WIDTH-1: 0] dataWriteToReg_Final; // assign ... = ..._MEM_WB
@@ -138,7 +149,7 @@ module CPU #(
     wire [1:0] ctrlMemToReg_ID_EX;
 
     wire [1:0] ctrlNPCFrom_ID_EX;
-    wire ctrlMemRead_ID_EX;
+    // wire ctrlMemRead_ID_EX;  // 向前定义
     wire ctrlMemWrite_ID_EX;
 
     wire [2:0] ctrlALUOp_ID_EX;
@@ -151,7 +162,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] immSignedExtended_ID_EX;
 
     wire [4: 0] rs_ID_EX;
-    wire [4: 0] rt_ID_EX;
+    // wire [4: 0] rt_ID_EX;  // 向前定义
     wire [4: 0] rd_ID_EX;
 
     wire [5: 0] func_ID_EX;
@@ -159,7 +170,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
 
     PipelineReg #(.WIDTH(170))
-        PipelineReg_ID_EX(clk, reset,
+        PipelineReg_ID_EX(clk, 1'b0,
 
             // From previous stage
 
@@ -326,7 +337,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] regOutData2_EX_MEM;
     
     PipelineReg #(.WIDTH(143))
-        PipelineReg_EX_MEM(clk, reset,
+        PipelineReg_EX_MEM(clk, ,
 
             // From previous stage
 
@@ -411,7 +422,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] memOutData_MEM_WB;
     
     PipelineReg #(.WIDTH(172))
-        PipelineReg_MEM_WB(clk, reset,
+        PipelineReg_MEM_WB(clk, ,
 
             // From previous stage
 
