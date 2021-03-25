@@ -46,7 +46,14 @@ module CPU #(
     wire [15: 0] imm_Final;
     wire [25: 0] jAddrOri_Final;
 
-    NPC npc(clk, ctrlNPCFrom_Final, branchTestResult_Final, PC, regOutData1_Final, imm_Final, jAddrOri_Final, PC4, PC);
+    wire stall_ID;
+    NPC npc(
+        clk,
+        
+        ctrlNPCFrom_Final, branchTestResult_Final, stall_ID,
+        
+         PC, regOutData1_Final, imm_Final, jAddrOri_Final, PC4, PC
+    );
     
 
     // 取指令
@@ -106,7 +113,7 @@ module CPU #(
     );
 
     // 冒险检测
-    wire stall_ID;
+    // wire stall_ID;  // 向前定义
     wire [4: 0] rt_ID_EX;
     wire ctrlMemRead_ID_EX;
     HazardDetect hazardDetect(
@@ -170,7 +177,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
 
     PipelineReg #(.WIDTH(170))
-        PipelineReg_ID_EX(clk, 1'b0,
+        PipelineReg_ID_EX(clk, stall_ID,
 
             // From previous stage
 

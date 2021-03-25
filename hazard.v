@@ -13,10 +13,12 @@ module HazardDetect (
     
     always @(*) begin
         if(ctrlMemRead_ID_EX
-            && rt_ID_EX == rt_IF_ID
-            && rt_ID_EX == rs_IF_ID    
+            && (rt_ID_EX == rt_IF_ID
+            || rt_ID_EX == rs_IF_ID)
         )
-        ctrlStall <= 0;
+            ctrlStall <= 1;
+        else
+            ctrlStall <= 0;
     end
 
 
