@@ -305,24 +305,6 @@ module CPU #(
             ctrlALUSrc2_ID_EX,
             aluSrc2
         );
-    // MUX4 muxALUSrc1(
-    //         regOutData1_ID_EX, 
-    //         immSignedExtended_ID_EX,
-    //         aluOut_EX_MEM,
-    //         dataWriteToReg_Final,
-
-    //         selAluSrc1,
-    //         aluSrc1
-    //     );
-    // MUX4 muxALUSrc2(
-    //         regOutData2_ID_EX, 
-    //         immSignedExtended_ID_EX,
-    //         aluOut_EX_MEM,
-    //         dataWriteToReg_Final,
-
-    //         selAluSrc2,
-    //         aluSrc2
-    //     );
 
 
     // 选择写寄存器
@@ -339,9 +321,14 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] aluOut;
     wire [4: 0] aluOp;
     wire aluTestResult;
-    assign branchTestResult = aluTestResult;
     ALUCtrl aluCtrl(ctrlALUOp_ID_EX, func_ID_EX, aluExtOp_ID_EX, aluOp);                 // ALU功能选择
     ALU alu(aluSrc1, aluSrc2, aluOp, aluOut, aluTestResult);   // ALU运算
+
+    // 分支相关
+    assign imm_Final = immSignedExtended_ID_EX[15: 0];
+    assign branchTestResult_Final = aluTestResult;
+    assign ctrlNPCFrom_Final  = ctrlNPCFrom_ID_EX;
+    assign regOutData1_Final  = regOutData1_ID_EX;
 
     // Pipeline
     wire [1:0] ctrlRegDst_EX_MEM;
@@ -353,12 +340,11 @@ module CPU #(
     wire ctrlMemWrite_EX_MEM;
 
     wire [`WORD_WIDTH-1: 0] PC4_EX_MEM;
-    wire branchTestResult_EX_MEM;
     // wire [`WORD_WIDTH-1: 0] aluOut_EX_MEM;   // 向前定义
     wire [`WORD_WIDTH-1: 0] regOutData1_EX_MEM;
     wire [`WORD_WIDTH-1: 0] regOutData2_Forwarded_EX_MEM;
-    
-    PipelineReg #(.WIDTH(143))
+
+    PipelineReg #(.WIDTH(142))
         PipelineReg_EX_MEM(clk, ,
 
             // From previous stage
@@ -376,7 +362,6 @@ module CPU #(
 
                 // Others
                 PC4_ID_EX,
-                branchTestResult,
                 aluOut,
                 regOutData1_ID_EX,
                 regOutData2_Forwarded,
@@ -397,7 +382,6 @@ module CPU #(
 
                 // Others
                 PC4_EX_MEM,
-                branchTestResult_EX_MEM,
                 aluOut_EX_MEM,
                 regOutData1_EX_MEM,
                 regOutData2_Forwarded_EX_MEM,
@@ -501,10 +485,8 @@ module CPU #(
             dataWriteToReg_Final
         );
 
-    assign ctrlNPCFrom_Final  = ctrlNPCFrom_MEM_WB;
     assign regWriteAddr_Final = regWriteAddr_MEM_WB;
     assign ctrlRegWrite_Final = ctrlRegWrite_MEM_WB;
-    assign regDataOut1_Final  = regOutData1_MEM_WB;
 
 endmodule
 
