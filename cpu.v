@@ -177,7 +177,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
 
     PipelineReg #(.WIDTH(168))
-        PipelineReg_ID_EX(clk, stall_ID,
+        PipelineReg_ID_EX(clk, 1'b0,
 
             // From previous stage
 
