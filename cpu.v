@@ -45,6 +45,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] regOutData1_Final;
     wire [15: 0] imm_Final;
     wire [25: 0] jAddrOri_Final;
+    wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
 
     wire stall_ID;
     NPC npc(
@@ -52,7 +53,7 @@ module CPU #(
         
         ctrlNPCFrom_Final, branchTestResult_Final, stall_ID,
         
-         PC, regOutData1_Final, imm_Final, jAddrOri_Final, PC4, PC
+        PC, PC4_ID_EX, regOutData1_Final, imm_Final, jAddrOri_Final, PC4, PC
     );
     
 
@@ -62,10 +63,11 @@ module CPU #(
 
 
     // IF/ID
+    wire rollback_IF_ID_EX;
     wire [31: 0] PC4_IF_ID;
     wire [31: 0] code_IF_ID;
     PipelineReg #(.WIDTH(64))
-        PipelineReg_IF_ID(clk, 1'b0,
+        PipelineReg_IF_ID(clk, rollback_IF_ID_EX,
             {PC4,       code},
             {PC4_IF_ID, code_IF_ID}
         );
@@ -118,9 +120,11 @@ module CPU #(
     wire ctrlMemRead_ID_EX;
     HazardDetect hazardDetect(
         ctrlMemRead_ID_EX,
+        ctrlNPCFrom_Final,
         rt_ID_EX,
         rs, rt,
-        stall_ID
+        stall_ID,
+        rollback_IF_ID_EX
     );
 
     // 选择写寄存器
@@ -174,10 +178,10 @@ module CPU #(
 
     wire [5: 0] func_ID_EX;
 
-    wire [`WORD_WIDTH-1: 0] PC4_ID_EX;
+    // wire [`WORD_WIDTH-1: 0] PC4_ID_EX;  // 向前定义
 
     PipelineReg #(.WIDTH(168))
-        PipelineReg_ID_EX(clk, 1'b0,
+        PipelineReg_ID_EX(clk, rollback_IF_ID_EX,
 
             // From previous stage
 
