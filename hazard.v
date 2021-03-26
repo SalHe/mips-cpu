@@ -6,6 +6,7 @@
 module HazardDetect (
     input wire ctrlMemRead_ID_EX,
     input wire [1:0] ctrlNPCFrom_Final,
+    input wire branchTestResult_Final,
 
     input wire [4:0] rt_ID_EX,
     input wire [4:0] rs_IF_ID,
@@ -26,7 +27,7 @@ module HazardDetect (
     end
 
     always @(*) begin
-        if(ctrlNPCFrom_Final != `NPC_PC4)
+        if(ctrlNPCFrom_Final == `NPC_JMP || (ctrlNPCFrom_Final == `NPC_BRANCH && branchTestResult_Final))
             rollback_IF_ID_EX <= 1;
         else
             rollback_IF_ID_EX <= 0;

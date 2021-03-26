@@ -37,7 +37,7 @@ module CPU #(
     wire [4: 0]  rs, rt, rd;
     wire [15: 0] imm;
     wire [4: 0]  shamt;
-    wire [25: 0] jaddrOri;
+    wire [25: 0] jAddrOri;
     wire [5:0]   func;
 
     wire [1: 0] ctrlNPCFrom_Final;
@@ -82,7 +82,7 @@ module CPU #(
     assign shamt    = code_IF_ID[10:6];
     assign func     = code_IF_ID[5:0];
     assign imm      = code_IF_ID[15:0];
-    assign jaddrOri = code_IF_ID[25:0];
+    assign jAddrOri = code_IF_ID[25:0];
     
     // 控制信号
     wire [1:0] ctrlRegDst;
@@ -121,6 +121,7 @@ module CPU #(
     HazardDetect hazardDetect(
         ctrlMemRead_ID_EX,
         ctrlNPCFrom_Final,
+        branchTestResult_Final,
         rt_ID_EX,
         rs, rt,
         stall_ID,
@@ -177,10 +178,11 @@ module CPU #(
     wire [4: 0] rd_ID_EX;
 
     wire [5: 0] func_ID_EX;
+    wire [25: 0] jAddrOri_ID_EX;
 
     // wire [`WORD_WIDTH-1: 0] PC4_ID_EX;  // 向前定义
 
-    PipelineReg #(.WIDTH(168))
+    PipelineReg #(.WIDTH(194))
         PipelineReg_ID_EX(clk, rollback_IF_ID_EX,
 
             // From previous stage
@@ -209,6 +211,7 @@ module CPU #(
 
                 // Others
                 PC4_IF_ID,
+                jAddrOri,
                 regOutData1,
                 regOutData2,
                 immSignedExtended,
@@ -241,6 +244,7 @@ module CPU #(
 
                 // Others
                 PC4_ID_EX,
+                jAddrOri_ID_EX,
                 regOutData1_ID_EX,
                 regOutData2_ID_EX,
                 immSignedExtended_ID_EX,
@@ -333,6 +337,7 @@ module CPU #(
     assign branchTestResult_Final = aluTestResult;
     assign ctrlNPCFrom_Final  = ctrlNPCFrom_ID_EX;
     assign regOutData1_Final  = regOutData1_ID_EX;
+    assign jAddrOri_Final = jAddrOri_ID_EX;
 
     // Pipeline
     wire [1:0] ctrlRegDst_EX_MEM;
@@ -432,7 +437,7 @@ module CPU #(
     wire [`WORD_WIDTH-1: 0] memOutData_MEM_WB;
     
     PipelineReg #(.WIDTH(172))
-        PipelineReg_MEM_WB(clk, ,
+        PipelineReg_MEM_WB(clk, 1'b0,
 
             // From previous stage
 
