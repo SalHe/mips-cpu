@@ -43,9 +43,9 @@ module Forwarding (
     // 所以书上给的额外的代码暂时没做处理 后面再看
 
     always @(*) begin
-        if(rs == rd_EX_MEM && ctrlRegWrite_EX_MEM && rt != 0)
+        if(rs == rd_EX_MEM && ctrlRegWrite_EX_MEM && rs != 0)
             sel1 <= `SEL_FORWARD_EX;
-        else if(rs == rd_MEM_WB && ctrlRegWrite_MEM_WB && rt != 0)
+        else if(rs == rd_MEM_WB && ctrlRegWrite_MEM_WB && rs != 0)
             sel1 <= `SEL_FORWARD_MEM;
         else
             sel1 <= `SEL_FORWARD_RAW;    
