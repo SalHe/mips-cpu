@@ -29,7 +29,7 @@ module NPC(
 
     always @(posedge clk) begin
         if (stall)
-            newPC <= PC;
+            newPC <= PC - 4;
         else
             case (nPCFrom)
                 `NPC_BRANCH: begin

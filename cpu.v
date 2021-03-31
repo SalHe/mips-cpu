@@ -183,7 +183,7 @@ module CPU #(
     // wire [`WORD_WIDTH-1: 0] PC4_ID_EX;  // 向前定义
 
     PipelineReg #(.WIDTH(194))
-        PipelineReg_ID_EX(clk, rollback_IF_ID_EX,
+        PipelineReg_ID_EX(clk, rollback_IF_ID_EX || stall_ID,
 
             // From previous stage
 
