@@ -20,7 +20,7 @@ module IM #(
     //     code <= imMem[PC[31:2]];
     // end
 
-    assign code = imMem[PC[31:2]];
+    assign code = imMem[PC[11:2]];
 
 endmodule
 

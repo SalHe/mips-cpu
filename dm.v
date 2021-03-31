@@ -19,6 +19,7 @@ module DM #(
 );
     
     reg [WORD_WIDTH-1: 0] mem[MEM_SIZE-1: 0]; 
+        integer i ;
 
     always @(posedge clk) begin
         if (toWrite) begin
@@ -30,6 +31,10 @@ module DM #(
                 $display("ARM After Write: [%X] = %X", memAddr, mem[memAddr]);
             `endif
         end
+        // $display("---------------------------------------------------------");
+        // for (i = 0; i<20; i++) begin
+        //     $display("MEM[%X]=%X, ",i, mem[i]);
+        // end
     end
     
     assign outData = mem[memAddr];
